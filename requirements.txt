@@ -1,0 +1,4 @@
+ddgs>=9.16.0
+requests>=2.30.0
+beautifulsoup4>=4.12.0
+

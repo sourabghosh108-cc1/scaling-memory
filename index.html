@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Shrishti AI — Browser-native AI Assistant</title>
+    <meta name="description" content="Browser-native AI assistant powered by Orange-B WebAssembly engine and web research." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="app" class="app-layout">
+      <!-- Mobile Backdrop -->
+      <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+      <!-- Left Navigation Sidebar -->
+      <aside id="sidebar" class="app-sidebar">
+        <div class="sidebar-top">
+          <div class="brand">
+            <img src="/logo.svg" alt="Shrishti AI Logo" class="brand-logo" />
+            <div class="brand-text">
+              <h1 class="brand-name">Shrishti AI</h1>
+              <span class="brand-tag">Orange-B Engine</span>
+            </div>
+          </div>
+          <button id="new-chat-btn" class="btn btn-primary new-chat-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <span>New Chat</span>
+          </button>
+        </div>
+
+        <!-- Conversations History List -->
+        <div class="sidebar-section">
+          <div class="section-label">Conversations</div>
+          <div id="conversation-list" class="conversation-list"></div>
+        </div>
+
+        <!-- Needle Engine Status Card -->
+        <div class="sidebar-status">
+          <div id="model-status-card" class="model-status-card">
+            <div class="status-header">
+              <div class="status-left">
+                <span class="status-dot badge-loading"></span>
+                <span class="status-label">Orange-B</span>
+              </div>
+              <span class="status-pill badge-loading">Initializing...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar Footer Controls -->
+        <div class="sidebar-footer">
+          <button id="theme-toggle" class="btn btn-ghost footer-btn" title="Toggle Theme">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <span>Light Mode</span>
+          </button>
+          <button id="settings-btn" class="btn btn-ghost footer-btn" title="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Settings</span>
+          </button>
+          <button id="clear-chat-btn" class="btn btn-ghost footer-btn text-danger" title="Clear Chat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+            <span>Clear Chat</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Conversation Area -->
+      <main class="app-main">
+        <!-- Top App Bar (Mobile Toggle + Title) -->
+        <header class="app-header">
+          <div class="header-left">
+            <button id="sidebar-toggle" class="btn-icon mobile-menu-btn" aria-label="Toggle Menu">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            </button>
+            <div class="header-title">
+              <h2>Shrishti AI</h2>
+              <span class="engine-badge">Orange-B 3.0</span>
+            </div>
+          </div>
+          <div class="header-right">
+            <span class="architecture-tag">100% In-Browser Inference</span>
+          </div>
+        </header>
+
+        <!-- Chat Messages Container -->
+        <div id="chat-messages" class="chat-messages"></div>
+
+        <!-- Command Shortcut Bar -->
+        <div class="command-bar" id="command-bar">
+          <button class="cmd-pill cmd-pill--active" data-query="Search the web for " data-mode="prefix" title="Web Research">
+            <span class="cmd-icon">🔍</span><span class="cmd-label">Research</span>
+          </button>
+          <button class="cmd-pill" data-query="Calculate " data-mode="prefix" title="Calculator">
+            <span class="cmd-icon">🧮</span><span class="cmd-label">Calculate</span>
+          </button>
+          <button class="cmd-pill" data-query="Translate hello into Hindi" data-mode="full" title="Translate text">
+            <span class="cmd-icon">🌐</span><span class="cmd-label">Translate</span>
+          </button>
+          <button class="cmd-pill" data-query="Find nearby hospitals in " data-mode="prefix" title="Find nearby places">
+            <span class="cmd-icon">📍</span><span class="cmd-label">Nearby</span>
+          </button>
+          <button class="cmd-pill" data-query="Find places in " data-mode="prefix" title="Search a location">
+            <span class="cmd-icon">🗺️</span><span class="cmd-label">Find Place</span>
+          </button>
+          <button class="cmd-pill" data-query="Give directions to " data-mode="prefix" title="Get driving directions">
+            <span class="cmd-icon">🧭</span><span class="cmd-label">Directions</span>
+          </button>
+          <button class="cmd-pill" data-query="Show weather in " data-mode="prefix" title="Check weather">
+            <span class="cmd-icon">🌤️</span><span class="cmd-label">Weather</span>
+          </button>
+          <button class="cmd-pill" data-query="Convert 10 miles to km" data-mode="full" title="Unit converter">
+            <span class="cmd-icon">⚖️</span><span class="cmd-label">Convert</span>
+          </button>
+        </div>
+
+        <!-- Chat Composer Bar -->
+        <div class="composer-container">
+          <form id="chat-form" class="composer-form">
+            <div class="composer-box">
+              <textarea
+                id="chat-input"
+                class="composer-textarea"
+                placeholder="Ask Shrishti AI to calculate, translate, find places, get directions, check weather, or search..."
+                rows="1"
+              ></textarea>
+              <div class="composer-actions">
+                <button
+                  type="button"
+                  id="mic-btn"
+                  class="btn-icon voice-btn"
+                  title="Voice Input (Whistle speech recognition)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" x2="12" y1="19" y2="22"/>
+                  </svg>
+                </button>
+                <button
+                  type="submit"
+                  id="send-btn"
+                  class="btn-icon send-btn"
+                  title="Send message"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" x2="11" y1="2" y2="13"/>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  id="stop-btn"
+                  class="btn-icon stop-btn hidden"
+                  title="Stop Execution"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </form>
+          <div class="composer-footer-note">
+            Powered by Orange-B 3.0. In-browser tool calling with Vercel Web Research.
+          </div>
+        </div>
+      </main>
+
+      <!-- Settings Modal -->
+      <div id="settings-modal" class="modal-backdrop">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3>Shrishti AI Settings</h3>
+            <button id="close-settings-btn" class="btn-icon close-btn">×</button>
+          </div>
+          <div class="modal-body">
+            <div class="setting-group">
+              <label for="tts-voice-select">Text to Speech Voice (Browser Web Speech)</label>
+              <select id="tts-voice-select" class="form-select">
+                <option value="">Default System Voice</option>
+              </select>
+              <div class="setting-actions">
+                <button type="button" id="test-tts-btn" class="btn btn-secondary btn-sm">Test Voice</button>
+                <label class="checkbox-label">
+                  <input type="checkbox" id="tts-mute-checkbox" />
+                  <span>Mute Speech Output</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="setting-group">
+              <label>Model Cache Management</label>
+              <p class="setting-desc">Orange-B 3 and Whistle models are stored in browser CacheStorage so they load instantly without redownloading.</p>
+              <button type="button" id="clear-cache-btn" class="btn btn-danger btn-sm">Clear Model Cache</button>
+            </div>
+
+            <div class="setting-group">
+              <label>Architecture & Engine</label>
+              <div class="architecture-specs">
+                <div><strong>Engine:</strong> Orange-B 3.0 (WebAssembly &amp; Vercel Research Engine)</div>
+                <div><strong>Speech Model:</strong> Whistle 16 kHz Mono STT</div>
+                <div><strong>Maps & Routing:</strong> Leaflet, OpenStreetMap, Nominatim, OSRM</div>
+                <div><strong>Weather Service:</strong> Open-Meteo API</div>
+                <div><strong>Math Parser:</strong> Pure Safe AST/Recursive Descent Parser</div>
+                <div><strong>Research Engine:</strong> Orange-B Web Research Engine (DDGS, Crawler &amp; Evidence Ranking)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>
